@@ -1,20 +1,12 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
-
+import { NotesProvider } from "@/app/context/notesContext";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 
 export const metadata: Metadata = {
   title: "NoteHub",
@@ -27,15 +19,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {}
-        <TanStackProvider>
-          <Header />
-          {children}
-          <Footer />
-        </TanStackProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
+          <div className="flex flex-col min-h-screen">
+            <NotesProvider>
+              <TanStackProvider>
+                <Header />
+                <main className="flex-grow container mx-auto p-4">
+                  {children}
+                </main>
+                <Footer />
+              </TanStackProvider>
+            </NotesProvider>
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
