@@ -1,14 +1,38 @@
 import NotesClient from "./Notes.client";
 import { fetchNotes } from "@/lib/api";
-import type { FetchNotesResponse } from "@/types/api";
+import { type Metadata } from "next";
 
-export default async function NotesPage() {
-  const initialNotesData: FetchNotesResponse = await fetchNotes(1, 12, "");
+export const metadata: Metadata = {
+  title: "Нататкі",
+};
+
+interface NotesPageProps {
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+  }>;
+}
+
+export default async function NotesPage({ searchParams }: NotesPageProps) {
+  // Чакаем searchParams асінхронна
+  const paramsObj = await searchParams;
+  const params = new URLSearchParams(
+    Object.entries(paramsObj).filter(([, value]) => value !== undefined) as [
+      string,
+      string,
+    ][]
+  );
+
+  const page = params.get("page") ? Number(params.get("page")) : 1;
+  const query = params.get("search") || "";
+
+  const initialNotesData = await fetchNotes(page, 12, query);
 
   return (
-    <main>
-      {}
-      <NotesClient initialNotesData={initialNotesData} />
-    </main>
+    <NotesClient
+      initialNotesData={initialNotesData}
+      initialPage={page}
+      initialQuery={query}
+    />
   );
 }

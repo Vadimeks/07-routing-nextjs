@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 import SearchBox from "@/components/SearchBox/SearchBox";
@@ -13,18 +13,41 @@ import { fetchNotes } from "@/lib/api";
 import type { FetchNotesResponse } from "@/types/api";
 import css from "./page.module.css";
 import { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface NotesClientProps {
   initialNotesData: FetchNotesResponse;
+  initialPage: number;
+  initialQuery: string;
 }
 
-export default function NotesClient({ initialNotesData }: NotesClientProps) {
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+export default function NotesClient({
+  initialNotesData,
+  initialPage,
+  initialQuery,
+}: NotesClientProps) {
+  const router = useRouter();
+  // Усталёўваем пачатковы стан на аснове props з сервера
+  const [query, setQuery] = useState(initialQuery);
+  const [page, setPage] = useState(initialPage);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [debouncedQuery] = useDebounce(query, 500);
 
-  const { data, isLoading, isError, error } = useQuery<
+  // Карэктна абнаўляем URL, калі змяняецца старонка ці пошукавы запыт
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (page > 1) {
+      params.set("page", String(page));
+    }
+    if (debouncedQuery) {
+      params.set("search", debouncedQuery);
+    }
+    // Выкарыстоўваем 'replace', каб не засмечваць гісторыю браўзера
+    router.replace(`?${params.toString()}`);
+  }, [page, debouncedQuery, router]);
+
+  // Выкарыстоўваем useQuery для кіравання станам загрузкі і кэша
+  const { data, isLoading, isError, error, isFetching } = useQuery<
     FetchNotesResponse,
     Error
   >({
@@ -54,11 +77,15 @@ export default function NotesClient({ initialNotesData }: NotesClientProps) {
     setIsModalOpen(false);
   };
 
+  const notesToShow = data?.notes;
+  const showLoader = (isLoading && !notesToShow) || isFetching;
+
   return (
     <div>
       <Toaster />
       <div className={css.app}>
         <header className={css.toolbar}>
+          {/* Уласцівасць initialQuery выдалена, паколькі яе няма ў SearchBoxProps */}
           <SearchBox onSearch={handleSearch} />
           {data && data.totalPages > 1 && (
             <Pagination
@@ -68,26 +95,30 @@ export default function NotesClient({ initialNotesData }: NotesClientProps) {
             />
           )}
           <button className={css.button} onClick={handleOpenModal}>
-            Create note +
+            Стварыць нататку +
           </button>
         </header>
-        {isLoading && !data && <Loader />}
+
+        {/* Паказваем loading, калі ідзе загрузка новых даных */}
+        {showLoader && <Loader />}
+
         {isError && (
           <div>
-            Error fetching notes: {error.message}
+            Памылка пры загрузцы нататак: {error.message}
             {error.message.includes("400") && (
-              <p>
-                Check if the token is valid or try a different search query.
-              </p>
+              <p>Праверце токен або паспрабуйце іншы пошукавы запыт.</p>
             )}
           </div>
         )}
-        {data && data.notes && data.notes.length > 0 && (
-          <NoteList notes={data.notes} />
+
+        {notesToShow && notesToShow.length > 0 && (
+          <NoteList notes={notesToShow} />
         )}
-        {data && data.notes && data.notes.length === 0 && !isLoading && (
-          <p>No notes found.</p>
+
+        {notesToShow && notesToShow.length === 0 && !showLoader && (
+          <p>Not not found</p>
         )}
+
         {isModalOpen && (
           <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
             <NoteForm onClose={handleCloseModal} />
