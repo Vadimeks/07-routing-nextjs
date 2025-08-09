@@ -1,3 +1,5 @@
+// lib/api.ts
+
 import axios from "axios";
 import type { Note } from "@/types/note";
 import type { FetchNotesResponse } from "@/types/api";
@@ -20,15 +22,25 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
 export const fetchNotes = async (
   page: number,
   perPage: number,
-  search: string = ""
+  search: string = "",
+  // **Дададзена**: Цяпер можна фільтраваць па тэгу
+  tag?: string
 ): Promise<FetchNotesResponse> => {
   try {
-    const params: { page: number; perPage: number; search?: string } = {
+    const params: {
+      page: number;
+      perPage: number;
+      search?: string;
+      tag?: string;
+    } = {
       page,
       perPage,
     };
     if (search) {
       params.search = search;
+    }
+    if (tag) {
+      params.tag = tag;
     }
     const response = await axios.get<FetchNotesResponse>(
       `${API_BASE_URL}/notes`,

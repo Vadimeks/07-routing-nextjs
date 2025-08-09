@@ -1,13 +1,14 @@
 // types/note.ts
+// Адзіны тып Note для ўсяго праекта
 
-// Now tags are not hardcoded, but instead a type that can be referenced from our API
 export type Tag = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
 
 export interface Note {
   id: string;
   title: string;
   content: string;
+  // **Зменена**: Цяпер гэта масіў тэгаў, як патрабуецца для фільтрацыі
+  tags: Tag[];
   createdAt: string;
   updatedAt: string;
-  tag: Tag;
 }
