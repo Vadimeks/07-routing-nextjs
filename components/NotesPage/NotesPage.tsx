@@ -6,11 +6,7 @@ import type { Note } from "@/types/note";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 
-// Заўвага: каб пазбегнуць памылак, пераканайцеся, што NoteList таксама абноўлены,
-// каб прымаць у якасці prop масіў аб'ектаў з уласцівасцю `tag`.
-
 const mockFetchNotes = async (): Promise<Note[]> => {
-  // Імітуем затрымку сеткі
   await new Promise((resolve) => setTimeout(resolve, 500));
   return [
     {
@@ -53,28 +49,29 @@ export default function NotesPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-4 flex justify-center items-center h-screen">
-        <p className="text-xl text-gray-500">Loading notes...</p>
+      <div className="app">
+        <div className="toolbar">
+          <p>Loading notes...</p>
+        </div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="container mx-auto p-4 flex justify-center items-center h-screen">
-        <p className="text-xl text-red-500">Error loading notes.</p>
+      <div className="app">
+        <div className="toolbar">
+          <p style={{ color: "red" }}>Error loading notes.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-900">My Notes</h2>
-        <Link
-          href="/notes/new"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-colors duration-200 flex items-center gap-2"
-        >
+    <div className="app">
+      <div className="toolbar">
+        <h2>My Notes</h2>
+        <Link href="/notes/new" className="button">
           <PlusCircle size={20} />
           <span>New Note</span>
         </Link>

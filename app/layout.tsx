@@ -1,3 +1,4 @@
+import styles from "./page.module.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -19,22 +20,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
-          <div className="flex flex-col min-h-screen">
-            <NotesProvider>
-              <TanStackProvider>
-                <Header />
-                <main className="flex-grow container mx-auto p-4">
-                  {children}
-                </main>
-                <Footer />
-              </TanStackProvider>
-            </NotesProvider>
-          </div>
-        </body>
-      </html>
+    <ClerkProvider afterSignOutUrl="/">
+      <NotesProvider>
+        <TanStackProvider>
+          <html lang="en">
+            {}
+            <body
+              className={`${GeistSans.variable} ${GeistMono.variable} ${styles.body}`}
+            >
+              <Header />
+              {}
+              <main>{children}</main>
+              <Footer />
+            </body>
+          </html>
+        </TanStackProvider>
+      </NotesProvider>
     </ClerkProvider>
   );
 }

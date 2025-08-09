@@ -1,39 +1,49 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useNotesContext } from "@/app/context/notesContext";
+import styles from "./TagsMenu.module.css";
+import Link from "next/link";
 
 const TagsMenu = () => {
-  const { uniqueTags, handleTagFilter, activeTag } = useNotesContext();
+  const { uniqueTags } = useNotesContext();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleToggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
-    <div className="flex flex-wrap gap-2 py-4">
-      {/* Кнопка для паказу ўсіх нататак */}
-      <button
-        onClick={() => handleTagFilter(null)}
-        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 ${
-          activeTag === null
-            ? "bg-gray-800 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
-      >
-        Усе
+    <div className={styles.menuContainer}>
+      <button onClick={handleToggleMenu} className={styles.menuButton}>
+        Notes ▾
       </button>
-
-      {/* Кнопкі для кожнага ўнікальнага тэга */}
-      {uniqueTags.map((tag: string) => (
-        <button
-          key={tag}
-          onClick={() => handleTagFilter(tag)}
-          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 ${
-            activeTag === tag
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
-        >
-          {tag}
-        </button>
-      ))}
+      {isOpen && (
+        <ul className={styles.menuList}>
+          {/* Спасылка для паказу ўсіх нататак */}
+          <li className={styles.menuItem}>
+            <Link
+              href="/notes/filter/all"
+              onClick={() => setIsOpen(false)}
+              className={styles.menuLink}
+            >
+              All notes
+            </Link>
+          </li>
+          {/* Спіс тэгаў, атрыманых з кантэксту */}
+          {uniqueTags.map((tag: string) => (
+            <li key={tag} className={styles.menuItem}>
+              <Link
+                href={`/notes/filter/${tag}`}
+                onClick={() => setIsOpen(false)}
+                className={styles.menuLink}
+              >
+                {tag}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

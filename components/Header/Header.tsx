@@ -3,27 +3,24 @@
 import Link from "next/link";
 import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import styles from "./Header.module.css";
-
+import TagsMenu from "../TagsMenu/TagsMenu";
 const Header = () => {
   return (
-    // Замест класаў Tailwind выкарыстоўваем клас з CSS модуля
     <header className={styles.header}>
       <nav>
-        {/* Асноўная спасылка з класам "headerLink" */}
+        {}
         <Link href="/" className={styles.headerLink}>
           NoteHub
         </Link>
         <div className={styles.navigation}>
-          {/* Навігацыйныя спасылкі з класамі "navigationItem" і "navigationLink" */}
-          <Link href="/notes" className={styles.navigationLink}>
-            Notes
-          </Link>
+          {}
+          <TagsMenu />
           <Link href="/about" className={styles.navigationLink}>
             About
           </Link>
           <SignedIn>
             <div className={styles.navigationItem}>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
             </div>
           </SignedIn>
           <SignedOut>
