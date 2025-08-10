@@ -3,13 +3,13 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Note, Tag } from "@/types/note";
 
+// Змінюємо інтерфейс, щоб він містив setUniqueTags, як ми й планували
 interface NotesContextType {
   notes: Note[];
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
   uniqueTags: Tag[];
-  // **Зменена**: activeTag можа быць любым радком (string) або null
+  setUniqueTags: React.Dispatch<React.SetStateAction<Tag[]>>;
   activeTag: string | null;
-  // **Зменена**: функцыя handleTagFilter цяпер прымае string | null
   handleTagFilter: (tag: string | null) => void;
   filteredNotes: Note[];
 }
@@ -28,12 +28,9 @@ export function useNotesContext() {
 
 export const NotesProvider = ({ children }: { children: ReactNode }) => {
   const [notes, setNotes] = useState<Note[]>([]);
+  // Тепер теги будуть зберігатися в окремому стані
+  const [uniqueTags, setUniqueTags] = useState<Tag[]>([]);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-
-  // Каб пазбегнуць памылкі тыпу, пераўтвараем унікальныя тэгі ў адпаведны тып Tag[]
-  const uniqueTags: Tag[] = Array.from(
-    new Set(notes.flatMap((note) => note.tags))
-  );
 
   const filteredNotes = activeTag
     ? notes.filter((note) => note.tags.includes(activeTag as Tag))
@@ -47,6 +44,7 @@ export const NotesProvider = ({ children }: { children: ReactNode }) => {
     notes,
     setNotes,
     uniqueTags,
+    setUniqueTags, // Додаємо setUniqueTags у провайдер
     activeTag,
     handleTagFilter,
     filteredNotes,

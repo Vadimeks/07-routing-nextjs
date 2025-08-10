@@ -1,3 +1,4 @@
+// app/notes/filter/[...slug]/Notes.client.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,27 +14,43 @@ import { fetchNotes } from "@/lib/api";
 import type { FetchNotesResponse } from "@/types/api";
 import css from "./page.module.css";
 import { Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useNotesContext } from "@/app/context/notesContext";
+// ❌ Выдаляем імпарт, бо ён не выкарыстоўваецца
+// import type { Tag } from "@/types/note";
 
 interface NotesClientProps {
   initialNotesData: FetchNotesResponse;
   initialPage: number;
   initialQuery: string;
+  initialTag: string;
+  // ❌ Выдаляем прапс, бо ён не выкарыстоўваецца
+  // allTags: string[];
 }
 
 export default function NotesClient({
   initialNotesData,
   initialPage,
   initialQuery,
+  initialTag,
+  // ❌ Выдаляем прапс
+  // allTags,
 }: NotesClientProps) {
   const router = useRouter();
-  // Усталёўваем пачатковы стан на аснове props з сервера
+  const pathname = usePathname();
+  const { setNotes } = useNotesContext();
+
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(initialPage);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [debouncedQuery] = useDebounce(query, 500);
 
-  // Карэктна абнаўляем URL, калі змяняецца старонка ці пошукавы запыт
+  const activeTag = initialTag;
+
+  useEffect(() => {
+    setNotes(initialNotesData.notes);
+  }, [initialNotesData, setNotes]);
+
   useEffect(() => {
     const params = new URLSearchParams();
     if (page > 1) {
@@ -42,17 +59,30 @@ export default function NotesClient({
     if (debouncedQuery) {
       params.set("search", debouncedQuery);
     }
-    // Выкарыстоўваем 'replace', каб не засмечваць гісторыю браўзера
-    router.replace(`?${params.toString()}`);
-  }, [page, debouncedQuery, router]);
 
-  // Выкарыстоўваем useQuery для кіравання станам загрузкі і кэша
-  const { data, isLoading, isError, error, isFetching } = useQuery<
-    FetchNotesResponse,
-    Error
-  >({
-    queryKey: ["notes", debouncedQuery, page],
-    queryFn: () => fetchNotes(page, 12, debouncedQuery),
+    let newPath = pathname;
+    if (activeTag && activeTag !== "All") {
+      newPath = `/notes/filter/${activeTag}`;
+    } else {
+      newPath = "/notes";
+    }
+
+    const newUrl = `${newPath}?${params.toString()}`;
+
+    if (newUrl !== `${pathname}?${params.toString()}`) {
+      router.replace(newUrl);
+    }
+  }, [page, debouncedQuery, router, activeTag, pathname]);
+
+  const { data, isLoading, isFetching } = useQuery<FetchNotesResponse, Error>({
+    queryKey: ["notes", debouncedQuery, page, activeTag],
+    queryFn: () =>
+      fetchNotes(
+        page,
+        12,
+        debouncedQuery,
+        activeTag === "All" ? undefined : activeTag
+      ),
     enabled: true,
     placeholderData: keepPreviousData,
     retry: 1,
@@ -77,19 +107,18 @@ export default function NotesClient({
     setIsModalOpen(false);
   };
 
-  const notesToShow = data?.notes;
-  const showLoader = (isLoading && !notesToShow) || isFetching;
+  const notesToShow = data?.notes || [];
+  const showLoader = (isLoading && !notesToShow.length) || isFetching;
 
   return (
     <div>
       <Toaster />
       <div className={css.app}>
         <header className={css.toolbar}>
-          {/* Уласцівасць initialQuery выдалена, паколькі яе няма ў SearchBoxProps */}
-          <SearchBox onSearch={handleSearch} />
+          <SearchBox onSearch={handleSearch} initialQuery={query} />
           {data && data.totalPages > 1 && (
             <Pagination
-              pageCount={Math.min(data.totalPages, 4)}
+              pageCount={data.totalPages}
               onPageChange={handlePageChange}
               currentPage={page}
             />
@@ -99,24 +128,12 @@ export default function NotesClient({
           </button>
         </header>
 
-        {/* Паказваем loading, калі ідзе загрузка новых даных */}
         {showLoader && <Loader />}
 
-        {isError && (
-          <div>
-            Памылка пры загрузцы нататак: {error.message}
-            {error.message.includes("400") && (
-              <p>Праверце токен або паспрабуйце іншы пошукавы запыт.</p>
-            )}
-          </div>
-        )}
+        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
 
-        {notesToShow && notesToShow.length > 0 && (
-          <NoteList notes={notesToShow} />
-        )}
-
-        {notesToShow && notesToShow.length === 0 && !showLoader && (
-          <p>Not not found</p>
+        {notesToShow.length === 0 && !showLoader && (
+          <p>Нататак не знойдзена.</p>
         )}
 
         {isModalOpen && (

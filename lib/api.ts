@@ -23,7 +23,6 @@ export const fetchNotes = async (
   page: number,
   perPage: number,
   search: string = "",
-  // **Дададзена**: Цяпер можна фільтраваць па тэгу
   tag?: string
 ): Promise<FetchNotesResponse> => {
   try {
@@ -36,12 +35,15 @@ export const fetchNotes = async (
       page,
       perPage,
     };
+
     if (search) {
       params.search = search;
     }
-    if (tag) {
+
+    if (tag && tag !== "All") {
       params.tag = tag;
     }
+
     const response = await axios.get<FetchNotesResponse>(
       `${API_BASE_URL}/notes`,
       {
@@ -51,6 +53,13 @@ export const fetchNotes = async (
     );
     return response.data;
   } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error(
+        `Error fetching notes: ${error.response.status} - ${error.response.data}`
+      );
+    } else {
+      console.error("Error fetching notes:", error);
+    }
     throw error;
   }
 };

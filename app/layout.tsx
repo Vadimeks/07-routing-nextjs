@@ -1,3 +1,5 @@
+// app/layout.tsx
+
 import styles from "./page.module.css";
 import "./globals.css";
 import type { Metadata } from "next";
@@ -8,6 +10,7 @@ import { NotesProvider } from "@/app/context/notesContext";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Tag } from "@/types/note";
 
 export const metadata: Metadata = {
   title: "NoteHub",
@@ -19,17 +22,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Вызначаем статычны спіс тэгаў, даступны для ўсіх старонак
+  const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
+
   return (
     <ClerkProvider afterSignOutUrl="/">
       <NotesProvider>
         <TanStackProvider>
           <html lang="en">
-            {}
             <body
               className={`${GeistSans.variable} ${GeistMono.variable} ${styles.body}`}
             >
-              <Header />
-              {}
+              {/* <-- Перадаем allTags у Header */}
+              <Header allTags={allTags} />
               <main>{children}</main>
               <Footer />
             </body>
