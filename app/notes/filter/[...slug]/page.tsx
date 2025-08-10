@@ -6,15 +6,8 @@ import { Toaster } from "react-hot-toast";
 import NotesClient from "./Notes.client";
 import { FetchNotesResponse } from "@/types/api";
 
-export const metadata: Metadata = {
-  title: "Notes",
-};
-
-// Проста выкарыстоўваем прапсы напрамую, і TypeScript будзе іх правільна тыпізаваць.
-export default async function NotesPage({
-  searchParams,
-  params,
-}: {
+// 1. Вызначаем тып для прапсаў, якія мы чакаем пасля "await"
+interface ResolvedNotesPageProps {
   searchParams: {
     page?: string;
     search?: string;
@@ -22,8 +15,25 @@ export default async function NotesPage({
   params: {
     slug: string[];
   };
-}) {
-  // Цяпер params і searchParams з'яўляюцца Promise, таму іх трэба чакаць
+}
+
+// 2. Вызначаем тып для функцыі, выкарыстоўваючы Awaited
+type NotesPageFunctionProps = {
+  [K in keyof ResolvedNotesPageProps]: Promise<
+    Awaited<ResolvedNotesPageProps[K]>
+  >;
+};
+
+export const metadata: Metadata = {
+  title: "Notes",
+};
+
+// 3. Выкарыстоўваем новы тып у сігнатуры кампанента
+export default async function NotesPage({
+  searchParams,
+  params,
+}: NotesPageFunctionProps) {
+  // Цяпер params і searchParams правільна тыпізаваныя як Promise, таму іх трэба чакаць
   const resolvedSearchParams = await searchParams;
   const resolvedParams = await params;
 
