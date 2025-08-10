@@ -4,8 +4,9 @@ import { fetchNotes } from "@/lib/api";
 import { type Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import NotesClient from "./Notes.client";
-
-import { Tag } from "@/types/note"; // Імпартуем статычны тып Tag
+import { FetchNotesResponse } from "@/types/api";
+// ❌ Гэты імпарт больш не патрэбны
+// import { Tag } from "@/types/note";
 
 export const metadata: Metadata = {
   title: "Notes",
@@ -30,24 +31,24 @@ export default async function NotesPage({
 
   const pageParam = resolvedSearchParams.page;
   const searchParam = resolvedSearchParams.search;
+  const slug = resolvedParams.slug;
 
   const page = pageParam ? Number(pageParam) : 1;
   const initialQuery = searchParam || "";
 
-  // Статычны спіс усіх тэгаў, як і на асноўнай старонцы
-  const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
+  // ❌ Гэты масіў больш не патрэбны
+  // const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
   const filterTag =
-    resolvedParams.slug &&
-    resolvedParams.slug.length > 0 &&
-    resolvedParams.slug[0] !== "all"
-      ? resolvedParams.slug[0]
-      : "All";
-
-  // Калі тэг - "All", перадаем undefined, а не пусты радок
+    slug && slug.length > 0 && slug[0] !== "all" ? slug[0] : "All";
   const tagForApi = filterTag === "All" ? undefined : filterTag;
 
-  const initialNotesData = await fetchNotes(page, 12, initialQuery, tagForApi);
+  const initialNotesData: FetchNotesResponse = await fetchNotes(
+    page,
+    12,
+    initialQuery,
+    tagForApi
+  );
 
   return (
     <>
@@ -56,7 +57,8 @@ export default async function NotesPage({
         initialPage={page}
         initialQuery={initialQuery}
         initialTag={filterTag}
-        allTags={allTags}
+        // ❌ Выдаляем гэты радок
+        // allTags={allTags}
       />
       <Toaster />
     </>

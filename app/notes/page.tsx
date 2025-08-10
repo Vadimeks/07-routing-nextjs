@@ -5,7 +5,8 @@ import { type Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import NotesClient from "@/app/notes/filter/[...slug]/Notes.client";
 import { FetchNotesResponse } from "@/types/api";
-import { Tag } from "@/types/note"; // Імпартуем статычны тып Tag
+// ❌ Гэты імпарт больш не патрэбны, калі мы не выкарыстоўваем allTags
+// import { Tag } from "@/types/note";
 
 export const metadata: Metadata = {
   title: "Notes",
@@ -27,10 +28,9 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   const page = pageParam ? Number(pageParam) : 1;
   const initialQuery = searchParam || "";
 
-  // Статычны спіс усіх тэгаў
-  const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
+  // ❌ Гэты масіў больш не патрэбны
+  // const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
-  // Выклік fetchNotes цяпер будзе толькі адзін
   const initialNotesData: FetchNotesResponse = await fetchNotes(
     page,
     12,
@@ -44,7 +44,8 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         initialPage={page}
         initialQuery={initialQuery}
         initialTag={""}
-        allTags={allTags}
+        // ❌ Выдаляем гэты радок
+        // allTags={allTags}
       />
       <Toaster />
     </>
