@@ -33,7 +33,7 @@ export const NotesProvider = ({ children }: { children: ReactNode }) => {
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
   const filteredNotes = activeTag
-    ? notes.filter((note) => note.tags.includes(activeTag as Tag))
+    ? notes.filter((note) => note.tag.includes(activeTag as Tag))
     : notes;
 
   const handleTagFilter = (tag: string | null) => {

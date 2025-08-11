@@ -1,14 +1,16 @@
 // types/note.ts
-// Адзіны тып Note для ўсяго праекта
-
-export type Tag = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
+export type Tag = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping" | "All";
 
 export interface Note {
   id: string;
   title: string;
   content: string;
-  // **Зменена**: Цяпер гэта масіў тэгаў, як патрабуецца для фільтрацыі
-  tags: Tag[];
+  tag: Tag;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
 }

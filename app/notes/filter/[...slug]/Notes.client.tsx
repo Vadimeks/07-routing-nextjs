@@ -1,9 +1,12 @@
-// app/notes/filter/[...slug]/Notes.client.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
+import { useRouter, usePathname } from "next/navigation";
+import { Toaster } from "react-hot-toast";
+import { useNotesContext } from "@/app/context/notesContext";
+
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
 import NoteList from "@/components/NoteList/NoteList";
@@ -11,21 +14,15 @@ import Loader from "@/components/Loader/Loader";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
 import { fetchNotes } from "@/lib/api";
-import type { FetchNotesResponse } from "@/types/api";
+import type { FetchNotesResponse, Tag } from "@/types/note";
 import css from "./page.module.css";
-import { Toaster } from "react-hot-toast";
-import { useRouter, usePathname } from "next/navigation";
-import { useNotesContext } from "@/app/context/notesContext";
-// ❌ Выдаляем імпарт, бо ён не выкарыстоўваецца
-// import type { Tag } from "@/types/note";
 
 interface NotesClientProps {
   initialNotesData: FetchNotesResponse;
   initialPage: number;
   initialQuery: string;
   initialTag: string;
-  // ❌ Выдаляем прапс, бо ён не выкарыстоўваецца
-  // allTags: string[];
+  allTags: Tag[];
 }
 
 export default function NotesClient({
@@ -33,8 +30,6 @@ export default function NotesClient({
   initialPage,
   initialQuery,
   initialTag,
-  // ❌ Выдаляем прапс
-  // allTags,
 }: NotesClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -113,35 +108,30 @@ export default function NotesClient({
   return (
     <div>
       <Toaster />
-      <div className={css.app}>
-        <header className={css.toolbar}>
+
+      <main className={css.app}>
+        <div className={css.toolbar}>
           <SearchBox onSearch={handleSearch} initialQuery={query} />
-          {data && data.totalPages > 1 && (
-            <Pagination
-              pageCount={data.totalPages}
-              onPageChange={handlePageChange}
-              currentPage={page}
-            />
-          )}
           <button className={css.button} onClick={handleOpenModal}>
-            Стварыць нататку +
+            Create note +
           </button>
-        </header>
-
-        {showLoader && <Loader />}
-
-        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
-
-        {notesToShow.length === 0 && !showLoader && (
-          <p>Нататак не знойдзена.</p>
+        </div>
+        {data && data.totalPages > 1 && (
+          <Pagination
+            pageCount={Math.min(data.totalPages, 4)}
+            onPageChange={handlePageChange}
+            currentPage={page}
+          />
         )}
-
+        {showLoader && <Loader />}
+        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
+        {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}
         {isModalOpen && (
           <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
             <NoteForm onClose={handleCloseModal} />
           </Modal>
         )}
-      </div>
+      </main>
     </div>
   );
 }

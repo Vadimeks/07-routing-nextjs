@@ -5,32 +5,26 @@ import { type Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import NotesClient from "@/app/notes/filter/[...slug]/Notes.client";
 import { FetchNotesResponse } from "@/types/api";
+import type { Tag } from "@/types/note";
 
-// 1. Вызначаем тып для прапсаў, якія мы чакаем пасля "await"
-interface ResolvedNotesPageProps {
+// 1. Вызначаем тып прапсаў, якія мы чакаем пасля "await"
+interface ResolvedPageProps {
   searchParams: {
     page?: string;
     search?: string;
   };
 }
 
-// 2. Вызначаем тып для функцыі, выкарыстоўваючы Awaited
-// Цяпер мы апрацоўваем толькі searchParams, бо params няма
-type NotesPageFunctionProps = {
-  [K in keyof ResolvedNotesPageProps]: Promise<
-    Awaited<ResolvedNotesPageProps[K]>
-  >;
+// 2. Абгортваем тып у Promise, каб адпавядаць патрабаванням Next.js 15
+type NotesPageProps = {
+  [K in keyof ResolvedPageProps]: Promise<ResolvedPageProps[K]>;
 };
 
 export const metadata: Metadata = {
   title: "Notes",
 };
 
-// 3. Выкарыстоўваем новы тып у сігнатуры кампанента
-export default async function NotesPage({
-  searchParams,
-}: NotesPageFunctionProps) {
-  // Цяпер searchParams правільна тыпізаваныя як Promise
+export default async function NotesPage({ searchParams }: NotesPageProps) {
   const resolvedSearchParams = await searchParams;
 
   const pageParam = resolvedSearchParams.page;
@@ -45,13 +39,23 @@ export default async function NotesPage({
     initialQuery
   );
 
+  const allTags: Tag[] = [
+    "Todo",
+    "Work",
+    "Personal",
+    "Meeting",
+    "Shopping",
+    "All",
+  ];
+
   return (
     <>
       <NotesClient
         initialNotesData={initialNotesData}
         initialPage={page}
         initialQuery={initialQuery}
-        initialTag={""}
+        initialTag={"All"}
+        allTags={allTags} // <-- Цяпер прапс allTags перадаецца
       />
       <Toaster />
     </>
