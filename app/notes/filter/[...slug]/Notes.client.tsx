@@ -1,3 +1,5 @@
+// app/notes/filter/[...slug]/Notes.client.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -55,11 +57,12 @@ export default function NotesClient({
       params.set("search", debouncedQuery);
     }
 
+    // Выпраўленая логіка для маршруту
     let newPath = pathname;
-    if (activeTag && activeTag !== "All") {
+    // Мы заўсёды пераходзім на маршрут з сайдбарам,
+    // таму не патрэбная асобная логіка для "All"
+    if (activeTag) {
       newPath = `/notes/filter/${activeTag}`;
-    } else {
-      newPath = "/notes";
     }
 
     const newUrl = `${newPath}?${params.toString()}`;

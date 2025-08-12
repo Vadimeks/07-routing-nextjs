@@ -42,7 +42,9 @@ export default async function NotesPage({
   const initialQuery = searchParam || "";
 
   const filterTag =
-    slug && slug.length > 0 && slug[0] !== "all" ? slug[0] : "All";
+    slug && slug.length > 0 && slug[0].toLowerCase() !== "all"
+      ? slug[0]
+      : "All";
   const tagForApi = filterTag === "All" ? undefined : filterTag;
 
   const initialNotesData: FetchNotesResponse = await fetchNotes(
