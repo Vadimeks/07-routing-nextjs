@@ -5,16 +5,16 @@
 import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import { useNotesContext } from "@/app/context/notesContext";
 
+import Link from "next/link";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
 import NoteList from "@/components/NoteList/NoteList";
 import Loader from "@/components/Loader/Loader";
-import Modal from "@/components/Modal/Modal";
-import NoteForm from "@/components/NoteForm/NoteForm";
+
 import { fetchNotes } from "@/lib/api";
 import type { FetchNotesResponse, Tag } from "@/types/note";
 import css from "./page.module.css";
@@ -35,11 +35,11 @@ export default function NotesClient({
 }: NotesClientProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { setNotes } = useNotesContext();
 
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(initialPage);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [debouncedQuery] = useDebounce(query, 500);
 
   const activeTag = initialTag;
@@ -49,28 +49,26 @@ export default function NotesClient({
   }, [initialNotesData, setNotes]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
+    // Дадаем праверку, каб useEffect не спрацоўваў на старонцы дэталяў нататкі
+    if (!pathname.includes("/notes/filter")) {
+      return;
+    }
+
+    const newSearchParams = new URLSearchParams();
+
     if (page > 1) {
-      params.set("page", String(page));
+      newSearchParams.set("page", String(page));
     }
     if (debouncedQuery) {
-      params.set("search", debouncedQuery);
+      newSearchParams.set("search", debouncedQuery);
     }
 
-    // Выпраўленая логіка для маршруту
-    let newPath = pathname;
-    // Мы заўсёды пераходзім на маршрут з сайдбарам,
-    // таму не патрэбная асобная логіка для "All"
-    if (activeTag) {
-      newPath = `/notes/filter/${activeTag}`;
-    }
+    const newUrl = `/notes/filter/${activeTag}?${newSearchParams.toString()}`;
 
-    const newUrl = `${newPath}?${params.toString()}`;
-
-    if (newUrl !== `${pathname}?${params.toString()}`) {
+    if (newUrl !== pathname + "?" + searchParams.toString()) {
       router.replace(newUrl);
     }
-  }, [page, debouncedQuery, router, activeTag, pathname]);
+  }, [page, debouncedQuery, activeTag, router, pathname, searchParams]);
 
   const { data, isLoading, isFetching } = useQuery<FetchNotesResponse, Error>({
     queryKey: ["notes", debouncedQuery, page, activeTag],
@@ -97,27 +95,18 @@ export default function NotesClient({
     setPage(selectedPage);
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
   const notesToShow = data?.notes || [];
   const showLoader = (isLoading && !notesToShow.length) || isFetching;
 
   return (
     <div>
       <Toaster />
-
       <main className={css.app}>
         <div className={css.toolbar}>
           <SearchBox onSearch={handleSearch} initialQuery={query} />
-          <button className={css.button} onClick={handleOpenModal}>
+          <Link href="/notes/create" className={css.button}>
             Create note +
-          </button>
+          </Link>
         </div>
         {data && data.totalPages > 1 && (
           <Pagination
@@ -129,11 +118,6 @@ export default function NotesClient({
         {showLoader && <Loader />}
         {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
         {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}
-        {isModalOpen && (
-          <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-            <NoteForm onClose={handleCloseModal} />
-          </Modal>
-        )}
       </main>
     </div>
   );

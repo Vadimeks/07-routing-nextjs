@@ -44,7 +44,7 @@ const TagsMenu = ({ allTags }: TagsMenuProps) => {
         <ul className={css.menuList}>
           <li className={css.menuItem}>
             <Link
-              href="/notes"
+              href="/notes/filter/All"
               className={`${css.menuLink} ${currentTag === "notes" || currentTag === "" ? css.active : ""}`}
             >
               All notes

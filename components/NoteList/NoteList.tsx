@@ -30,13 +30,14 @@ export default function NoteList({ notes }: NoteListProps) {
   };
 
   return (
-    <div className={styles.list}>
+    <ul className={styles.list}>
       {notes.map((note) => (
-        <div key={note.id} className={styles.listItem}>
+        <li key={note.id} className={styles.listItem}>
           <h3 className={styles.title}>{note.title}</h3>
           <p className={styles.content}>{note.content}</p>
           <div className={styles.footer}>
-            {}
+            <span className={styles.tag}>{note.tag}</span>{" "}
+            {/* <-- Дададзены тэг */}
             <Link href={`/notes/${note.id}`} className={styles.link}>
               View details
             </Link>
@@ -48,8 +49,8 @@ export default function NoteList({ notes }: NoteListProps) {
               Delete
             </button>
           </div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

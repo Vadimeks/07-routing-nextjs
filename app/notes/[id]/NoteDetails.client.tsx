@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
 import css from "@/app/notes/[id]//NoteDetails.module.css";
@@ -9,6 +9,7 @@ import type { Note } from "@/types/note";
 export default function NoteDetailsClient() {
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter(); // <- Дадаем useRouter для кнопкі "назад"
 
   const {
     data: note,
@@ -21,6 +22,10 @@ export default function NoteDetailsClient() {
     enabled: !!id,
     refetchOnMount: false,
   });
+
+  const handleBackClick = () => {
+    router.back();
+  };
 
   if (isLoading) {
     return <p>Loading, please wait...</p>;
@@ -36,9 +41,13 @@ export default function NoteDetailsClient() {
 
   return (
     <div className={css.container}>
+      <button className={css.backBtn} onClick={handleBackClick}>
+        Go back
+      </button>
       <div className={css.item}>
         <div className={css.header}>
           <h2>{note.title}</h2>
+          <span className={css.tag}>{note.tag}</span> {/* <- Дададзены тэг */}
         </div>
         <p className={css.content}>{note.content}</p>
         <p className={css.date}>
