@@ -1,3 +1,4 @@
+/* components/NoteList/NoteList.tsx */
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -36,8 +37,7 @@ export default function NoteList({ notes }: NoteListProps) {
           <h3 className={styles.title}>{note.title}</h3>
           <p className={styles.content}>{note.content}</p>
           <div className={styles.footer}>
-            <span className={styles.tag}>{note.tag}</span>{" "}
-            {/* <-- Дададзены тэг */}
+            <span className={styles.tag}>{note.tag}</span> {}
             <Link href={`/notes/${note.id}`} className={styles.link}>
               View details
             </Link>

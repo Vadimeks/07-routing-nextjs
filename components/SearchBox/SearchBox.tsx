@@ -1,9 +1,9 @@
+/* components/SearchBox/SearchBox.tsx */
 import React, { useState, useEffect } from "react";
 import css from "./SearchBox.module.css";
 
 interface SearchBoxProps {
   onSearch: (query: string) => void;
-  // Дададзены тып для `initialQuery`
   initialQuery?: string;
 }
 
@@ -13,7 +13,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 }) => {
   const [query, setQuery] = useState(initialQuery);
 
-  // Сінхранізуем унутраны стан з знешнімі параметрамі
   useEffect(() => {
     setQuery(initialQuery);
   }, [initialQuery]);
@@ -32,13 +31,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({
       <form className={css.searchForm} onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Пошук нататак..."
+          placeholder="Search notes..."
           value={query}
           onChange={handleInputChange}
           className={css.searchInput}
         />
         <button type="submit" className={css.searchButton}>
-          Пошук
+          Find
         </button>
       </form>
     </div>

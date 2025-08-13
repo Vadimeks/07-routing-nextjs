@@ -1,3 +1,4 @@
+/* components/Pagination/Pagination.tsx */
 import ReactPaginate from "react-paginate";
 import css from "@/components/Pagination/Pagination.module.css";
 

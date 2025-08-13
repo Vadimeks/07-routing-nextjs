@@ -22,7 +22,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Вызначаем статычны спіс тэгаў, даступны для ўсіх старонак
   const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
   return (
@@ -33,7 +32,7 @@ export default function RootLayout({
             <body
               className={`${GeistSans.variable} ${GeistMono.variable} ${styles.body}`}
             >
-              {/* <-- Перадаем allTags у Header */}
+              {}
               <Header allTags={allTags} />
               <main>{children}</main>
               <Footer />
