@@ -1,5 +1,4 @@
 // app/layout.tsx
-
 import styles from "./page.module.css";
 import "./globals.css";
 import type { Metadata } from "next";
@@ -11,6 +10,7 @@ import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Tag } from "@/types/note";
+import homeStyles from "./Home.module.css";
 
 export const metadata: Metadata = {
   title: "NoteHub",
@@ -19,8 +19,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal, // Додаємо пропс "modal"
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode; // Типізуємо "modal"
 }>) {
   const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
@@ -32,9 +34,10 @@ export default function RootLayout({
             <body
               className={`${GeistSans.variable} ${GeistMono.variable} ${styles.body}`}
             >
-              {}
               <Header allTags={allTags} />
-              <main>{children}</main>
+              <main className={homeStyles.main}>{children}</main>
+              <div id="modal-root" /> {}
+              {modal}
               <Footer />
             </body>
           </html>
