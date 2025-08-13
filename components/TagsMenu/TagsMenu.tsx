@@ -19,14 +19,25 @@ const TagsMenu = ({ allTags }: TagsMenuProps) => {
     setIsOpen(!isOpen);
   };
 
+  const handleLinkClick = () => {
+    setIsOpen(false);
+  };
+
   useEffect(() => {
-    const handleOutsideClick = () => {
-      setIsOpen(false);
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        event.target instanceof HTMLElement &&
+        !document.querySelector(`.${css.menuContainer}`)?.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
     };
 
     if (isOpen) {
       document.addEventListener("click", handleOutsideClick);
     }
+
     return () => {
       document.removeEventListener("click", handleOutsideClick);
     };
@@ -46,6 +57,7 @@ const TagsMenu = ({ allTags }: TagsMenuProps) => {
             <Link
               href="/notes/filter/All"
               className={`${css.menuLink} ${currentTag === "notes" || currentTag === "" ? css.active : ""}`}
+              onClick={handleLinkClick}
             >
               All notes
             </Link>
@@ -55,6 +67,7 @@ const TagsMenu = ({ allTags }: TagsMenuProps) => {
               <Link
                 href={`/notes/filter/${tag}`}
                 className={`${css.menuLink} ${currentTag === tag ? css.active : ""}`}
+                onClick={handleLinkClick}
               >
                 {tag}
               </Link>
