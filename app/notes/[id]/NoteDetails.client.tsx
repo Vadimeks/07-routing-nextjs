@@ -1,3 +1,4 @@
+// app/notes/[id]/NoteDetails.client.tsx
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -9,7 +10,7 @@ import type { Note } from "@/types/note";
 export default function NoteDetailsClient() {
   const params = useParams();
   const id = params.id as string;
-  const router = useRouter(); // <- Дадаем useRouter для кнопкі "назад"
+  const router = useRouter();
 
   const {
     data: note,
@@ -47,7 +48,7 @@ export default function NoteDetailsClient() {
       <div className={css.item}>
         <div className={css.header}>
           <h2>{note.title}</h2>
-          <span className={css.tag}>{note.tag}</span> {/* <- Дададзены тэг */}
+          <span className={css.tag}>{note.tag}</span> {}
         </div>
         <p className={css.content}>{note.content}</p>
         <p className={css.date}>

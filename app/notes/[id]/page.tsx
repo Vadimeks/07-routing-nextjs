@@ -1,3 +1,5 @@
+// app/notes/[id]/page.tsx
+
 import { QueryClient, dehydrate } from "@tanstack/react-query";
 import NoteDetailsClient from "@/app/notes/[id]/NoteDetails.client";
 import { fetchNoteById } from "@/lib/api";
@@ -8,7 +10,7 @@ export default async function NoteDetailsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const resolvedParams = await params; // Апрацоўваем асінхронны params
+  const resolvedParams = await params;
   const { id } = resolvedParams;
 
   const queryClient = new QueryClient();

@@ -1,3 +1,4 @@
+// app/notes/[id]/error.tsx
 "use client";
 
 export default function Error({ error }: { error: Error }) {

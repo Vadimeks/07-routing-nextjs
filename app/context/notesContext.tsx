@@ -1,9 +1,9 @@
+// app/notesContext.tsx
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { Note, Tag } from "@/types/note";
 
-// Змінюємо інтерфейс, щоб він містив setUniqueTags, як ми й планували
 interface NotesContextType {
   notes: Note[];
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
@@ -28,7 +28,6 @@ export function useNotesContext() {
 
 export const NotesProvider = ({ children }: { children: ReactNode }) => {
   const [notes, setNotes] = useState<Note[]>([]);
-  // Тепер теги будуть зберігатися в окремому стані
   const [uniqueTags, setUniqueTags] = useState<Tag[]>([]);
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
@@ -44,7 +43,7 @@ export const NotesProvider = ({ children }: { children: ReactNode }) => {
     notes,
     setNotes,
     uniqueTags,
-    setUniqueTags, // Додаємо setUniqueTags у провайдер
+    setUniqueTags,
     activeTag,
     handleTagFilter,
     filteredNotes,
