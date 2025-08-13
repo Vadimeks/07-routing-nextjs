@@ -7,7 +7,6 @@ import NotesClient from "@/app/notes/filter/[...slug]/Notes.client";
 import { FetchNotesResponse } from "@/types/api";
 import type { Tag } from "@/types/note";
 
-// 1. Вызначаем тып прапсаў, якія мы чакаем пасля "await"
 interface ResolvedPageProps {
   searchParams: {
     page?: string;
@@ -15,7 +14,6 @@ interface ResolvedPageProps {
   };
 }
 
-// 2. Абгортваем тып у Promise, каб адпавядаць патрабаванням Next.js 15
 type NotesPageProps = {
   [K in keyof ResolvedPageProps]: Promise<ResolvedPageProps[K]>;
 };
@@ -55,7 +53,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         initialPage={page}
         initialQuery={initialQuery}
         initialTag={"All"}
-        allTags={allTags} // <-- Цяпер прапс allTags перадаецца
+        allTags={allTags}
       />
       <Toaster />
     </>

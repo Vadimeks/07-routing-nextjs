@@ -11,7 +11,7 @@ export default function NotesLayout({
   return (
     <div>
       {children}
-      <div id="modal-root" /> {/* <-- Вось ён, фінальны элемент! */}
+      <div id="modal-root" /> {}
       {modal}
     </div>
   );

@@ -21,7 +21,6 @@ export default function SidebarNotes() {
         {allTags.map((tag) => (
           <li key={tag} className={css.menuItem}>
             <Link
-              // Тут мы робім спасылкі ў адпаведнасці з заданнем
               href={
                 tag === "All" ? "/notes/filter/All" : `/notes/filter/${tag}`
               }

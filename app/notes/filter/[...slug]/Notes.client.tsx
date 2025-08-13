@@ -49,7 +49,6 @@ export default function NotesClient({
   }, [initialNotesData, setNotes]);
 
   useEffect(() => {
-    // Дадаем праверку, каб useEffect не спрацоўваў на старонцы дэталяў нататкі
     if (!pathname.includes("/notes/filter")) {
       return;
     }

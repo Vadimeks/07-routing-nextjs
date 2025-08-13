@@ -1,3 +1,4 @@
+// app/notes/filter/[..slug]/error.tsx
 "use client";
 
 export default function Error({ error }: { error: Error }) {
