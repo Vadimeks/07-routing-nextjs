@@ -43,8 +43,12 @@ export default function NotesClient({
   const [page, setPage] = useState(initialPage);
   const [debouncedQuery] = useDebounce(query, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTag, setActiveTag] = useState(initialTag); // <-- Зменена на стан React
 
-  const activeTag = initialTag;
+  // <-- Дададзены useEffect, каб абнаўляць activeTag, калі змяняецца initialTag
+  useEffect(() => {
+    setActiveTag(initialTag);
+  }, [initialTag]);
 
   useEffect(() => {
     setNotes(initialNotesData.notes);
@@ -69,7 +73,7 @@ export default function NotesClient({
     if (newUrl !== pathname + "?" + searchParams.toString()) {
       router.replace(newUrl);
     }
-  }, [page, debouncedQuery, activeTag, router, pathname, searchParams]);
+  }, [page, debouncedQuery, activeTag, router, pathname, searchParams]); // <-- activeTag дададзены ў залежнасці
 
   const { data, isLoading, isFetching } = useQuery<FetchNotesResponse, Error>({
     queryKey: ["notes", debouncedQuery, page, activeTag],
@@ -104,14 +108,15 @@ export default function NotesClient({
 
   return (
     <div>
-      <Toaster />
+      <Toaster />{" "}
       <main className={css.app}>
+        {" "}
         <div className={css.toolbar}>
-          <SearchBox onSearch={handleSearch} initialQuery={query} />
+          <SearchBox onSearch={handleSearch} initialQuery={query} />{" "}
           <button className={css.button} onClick={handleOpenModal}>
-            Create note +
-          </button>
-        </div>
+            Create note +{" "}
+          </button>{" "}
+        </div>{" "}
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={Math.min(data.totalPages, 4)}
@@ -119,15 +124,15 @@ export default function NotesClient({
             currentPage={page}
           />
         )}
-        {showLoader && <Loader />}
-        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
-        {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}
-      </main>
+        {showLoader && <Loader />}{" "}
+        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}{" "}
+        {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}{" "}
+      </main>{" "}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-          <NoteForm allTags={allTags} onClose={handleCloseModal} />
+          <NoteForm allTags={allTags} onClose={handleCloseModal} />{" "}
         </Modal>
-      )}
+      )}{" "}
     </div>
   );
 }
