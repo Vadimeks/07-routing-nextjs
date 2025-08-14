@@ -30,27 +30,32 @@ export default function NoteList({ notes }: NoteListProps) {
     mutation.mutate(id);
   };
 
+  if (notes.length === 0) {
+    return <p>No notes found.</p>;
+  }
+
   return (
     <ul className={styles.list}>
+      {" "}
       {notes.map((note) => (
         <li key={note.id} className={styles.listItem}>
-          <h3 className={styles.title}>{note.title}</h3>
-          <p className={styles.content}>{note.content}</p>
+          <h3 className={styles.title}>{note.title}</h3>{" "}
+          <p className={styles.content}>{note.content}</p>{" "}
           <div className={styles.footer}>
-            <span className={styles.tag}>{note.tag}</span> {}
+            <span className={styles.tag}>{note.tag}</span>{" "}
             <Link href={`/notes/${note.id}`} className={styles.link}>
-              View details
-            </Link>
+              View details{" "}
+            </Link>{" "}
             <button
               className={styles.button}
               onClick={() => handleDelete(note.id)}
               disabled={mutation.isPending}
             >
-              Delete
-            </button>
-          </div>
+              Delete{" "}
+            </button>{" "}
+          </div>{" "}
         </li>
-      ))}
+      ))}{" "}
     </ul>
   );
 }

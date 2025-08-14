@@ -43,9 +43,8 @@ export default function NotesClient({
   const [page, setPage] = useState(initialPage);
   const [debouncedQuery] = useDebounce(query, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTag, setActiveTag] = useState(initialTag); // <-- Зменена на стан React
+  const [activeTag, setActiveTag] = useState(initialTag);
 
-  // <-- Дададзены useEffect, каб абнаўляць activeTag, калі змяняецца initialTag
   useEffect(() => {
     setActiveTag(initialTag);
   }, [initialTag]);
@@ -73,7 +72,7 @@ export default function NotesClient({
     if (newUrl !== pathname + "?" + searchParams.toString()) {
       router.replace(newUrl);
     }
-  }, [page, debouncedQuery, activeTag, router, pathname, searchParams]); // <-- activeTag дададзены ў залежнасці
+  }, [page, debouncedQuery, activeTag, router, pathname, searchParams]);
 
   const { data, isLoading, isFetching } = useQuery<FetchNotesResponse, Error>({
     queryKey: ["notes", debouncedQuery, page, activeTag],
@@ -124,9 +123,7 @@ export default function NotesClient({
             currentPage={page}
           />
         )}
-        {showLoader && <Loader />}{" "}
-        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}{" "}
-        {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}{" "}
+        {showLoader && <Loader />} {<NoteList notes={notesToShow} />}{" "}
       </main>{" "}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
