@@ -17,6 +17,7 @@ import NoteForm from "@/components/NoteForm/NoteForm";
 import { fetchNotes } from "@/lib/api";
 import type { FetchNotesResponse, Tag } from "@/types/note";
 import css from "./page.module.css";
+import Link from "next/link";
 
 interface NotesClientProps {
   initialNotesData: FetchNotesResponse;
@@ -42,12 +43,6 @@ export default function NotesClient({
   const [page, setPage] = useState(initialPage);
   const [debouncedQuery] = useDebounce(query, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTag, setActiveTag] = useState(initialTag);
-
-  useEffect(() => {
-    setActiveTag(initialTag);
-  }, [initialTag]);
-
   useEffect(() => {
     setNotes(initialNotesData.notes);
   }, [initialNotesData, setNotes]);
@@ -66,21 +61,21 @@ export default function NotesClient({
       newSearchParams.set("search", debouncedQuery);
     }
 
-    const newUrl = `/notes/filter/${activeTag}?${newSearchParams.toString()}`;
+    const newUrl = `/notes/filter/${initialTag}?${newSearchParams.toString()}`;
 
     if (newUrl !== pathname + "?" + searchParams.toString()) {
       router.replace(newUrl);
     }
-  }, [page, debouncedQuery, activeTag, router, pathname, searchParams]);
+  }, [page, debouncedQuery, initialTag, router, pathname, searchParams]);
 
   const { data, isLoading, isFetching } = useQuery<FetchNotesResponse, Error>({
-    queryKey: ["notes", debouncedQuery, page, activeTag],
+    queryKey: ["notes", debouncedQuery, page, initialTag],
     queryFn: () =>
       fetchNotes(
         page,
         12,
         debouncedQuery,
-        activeTag === "All" ? undefined : activeTag
+        initialTag === "All" ? undefined : initialTag
       ),
     enabled: true,
     placeholderData: keepPreviousData,
@@ -98,11 +93,6 @@ export default function NotesClient({
     setPage(selectedPage);
   };
 
-  const handleTagClick = (tag: string) => {
-    setActiveTag(tag);
-    setPage(1);
-  };
-
   const notesToShow = data?.notes || [];
   const showLoader = (isLoading && !notesToShow.length) || isFetching;
 
@@ -118,15 +108,17 @@ export default function NotesClient({
           <SearchBox onSearch={handleSearch} initialQuery={query} /> {}
           <div className={css.tagFilter}>
             {allTags.map((tag) => (
-              <button
+              <Link
                 key={tag}
-                onClick={() => handleTagClick(tag)}
+                href={
+                  tag === "All" ? "/notes/filter/All" : `/notes/filter/${tag}`
+                }
                 className={
-                  activeTag === tag ? css.activeTagButton : css.tagButton
+                  initialTag === tag ? css.activeTagButton : css.tagButton
                 }
               >
                 {tag}
-              </button>
+              </Link>
             ))}
           </div>{" "}
           <button className={css.button} onClick={handleOpenModal}>
@@ -146,7 +138,7 @@ export default function NotesClient({
       </main>{" "}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-          <NoteForm allTags={allTags} onClose={handleCloseModal} />{" "}
+          <NoteForm allTags={allTags} onClose={handleCloseModal} />  {" "}
         </Modal>
       )}{" "}
     </div>

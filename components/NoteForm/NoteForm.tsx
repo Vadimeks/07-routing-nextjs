@@ -12,13 +12,12 @@ import toast from "react-hot-toast";
 
 interface NoteFormProps {
   onClose: () => void;
-  allTags: Tag[]; // <- Дадаём пропс allTags
+  allTags: Tag[];
 }
 
 export default function NoteForm({ onClose, allTags }: NoteFormProps) {
   const queryClient = useQueryClient();
 
-  // Абнаўляем validationSchema, каб яна выкарыстоўвала allTags
   const validationSchema = Yup.object({
     title: Yup.string()
       .required("Title is required")
@@ -47,7 +46,7 @@ export default function NoteForm({ onClose, allTags }: NoteFormProps) {
       initialValues={{
         title: "",
         content: "",
-        // Усталёўваем першы тэг як значэнне па змаўчанні
+
         tag: allTags[0] || "",
       }}
       validationSchema={validationSchema}
@@ -96,7 +95,7 @@ export default function NoteForm({ onClose, allTags }: NoteFormProps) {
               as="select"
               className={styles.select}
             >
-              {/* Дынамічна генеруем опцыі з allTags */}
+              {}
               {allTags &&
                 allTags.map((tag) => (
                   <option key={tag} value={tag}>

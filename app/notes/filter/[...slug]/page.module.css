@@ -32,11 +32,9 @@
     background-color: #0b5ed7;
 }
 
-/* Стылі для фільтрацыі па тэгах */
 .tagFilter {
     display: flex;
     gap: 4px;
-
 }
 
 .tagButton {
@@ -48,6 +46,8 @@
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .tagButton:hover {
@@ -59,10 +59,14 @@
     color: #fff;
     border-color: #0d6efd;
     border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 14px;
+    text-decoration: none;
+
+    display: inline-block;
 }
 
 .activeTagButton:hover {
     background-color: #0d6efd;
-    /* Не мяняем колер пры навядзенні на актыўны стан */
     color: #fff;
 }
