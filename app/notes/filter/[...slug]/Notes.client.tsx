@@ -1,4 +1,3 @@
-// app/notes/filter/[...slug]/Notes.client.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -99,6 +98,11 @@ export default function NotesClient({
     setPage(selectedPage);
   };
 
+  const handleTagClick = (tag: string) => {
+    setActiveTag(tag);
+    setPage(1);
+  };
+
   const notesToShow = data?.notes || [];
   const showLoader = (isLoading && !notesToShow.length) || isFetching;
 
@@ -111,19 +115,34 @@ export default function NotesClient({
       <main className={css.app}>
         {" "}
         <div className={css.toolbar}>
-          <SearchBox onSearch={handleSearch} initialQuery={query} />{" "}
+          <SearchBox onSearch={handleSearch} initialQuery={query} /> {}
+          <div className={css.tagFilter}>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => handleTagClick(tag)}
+                className={
+                  activeTag === tag ? css.activeTagButton : css.tagButton
+                }
+              >
+                {tag}
+              </button>
+            ))}
+          </div>{" "}
           <button className={css.button} onClick={handleOpenModal}>
             Create note +{" "}
           </button>{" "}
         </div>{" "}
         {data && data.totalPages > 1 && (
           <Pagination
-            pageCount={Math.min(data.totalPages, 4)}
+            pageCount={data.totalPages}
             onPageChange={handlePageChange}
             currentPage={page}
           />
         )}
-        {showLoader && <Loader />} {<NoteList notes={notesToShow} />}{" "}
+        {showLoader && <Loader />}
+        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
+        {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}{" "}
       </main>{" "}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
