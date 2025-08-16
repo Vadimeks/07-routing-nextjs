@@ -12,11 +12,13 @@ import toast from "react-hot-toast";
 
 interface NoteFormProps {
   onClose: () => void;
-  allTags: Tag[];
 }
 
-export default function NoteForm({ onClose, allTags }: NoteFormProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
+
+  // Ствараем спіс тэгаў лакальна, як патрабуе ментар
+  const allTags: Tag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -46,7 +48,6 @@ export default function NoteForm({ onClose, allTags }: NoteFormProps) {
       initialValues={{
         title: "",
         content: "",
-
         tag: allTags[0] || "",
       }}
       validationSchema={validationSchema}
@@ -95,13 +96,11 @@ export default function NoteForm({ onClose, allTags }: NoteFormProps) {
               as="select"
               className={styles.select}
             >
-              {}
-              {allTags &&
-                allTags.map((tag) => (
-                  <option key={tag} value={tag}>
-                    {tag}
-                  </option>
-                ))}
+              {allTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
             </Field>
             <ErrorMessage name="tag" component="div" className={styles.error} />
           </div>

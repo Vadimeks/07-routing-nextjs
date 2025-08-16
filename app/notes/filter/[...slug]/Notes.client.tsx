@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
-import { useNotesContext } from "@/app/context/notesContext";
 
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
@@ -17,71 +19,35 @@ import NoteForm from "@/components/NoteForm/NoteForm";
 import { fetchNotes } from "@/lib/api";
 import type { FetchNotesResponse, Tag } from "@/types/note";
 import css from "./page.module.css";
-import Link from "next/link";
 
 interface NotesClientProps {
-  initialNotesData: FetchNotesResponse;
-  initialPage: number;
-  initialQuery: string;
-  initialTag: string;
-  allTags: Tag[];
+  notesData: FetchNotesResponse;
+  tag: Tag;
 }
 
-export default function NotesClient({
-  initialNotesData,
-  initialPage,
-  initialQuery,
-  initialTag,
-  allTags,
-}: NotesClientProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { setNotes } = useNotesContext();
-
-  const [query, setQuery] = useState(initialQuery);
-  const [page, setPage] = useState(initialPage);
+export default function NotesClient({ notesData, tag }: NotesClientProps) {
+  const queryClient = useQueryClient();
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
   const [debouncedQuery] = useDebounce(query, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  useEffect(() => {
-    setNotes(initialNotesData.notes);
-  }, [initialNotesData, setNotes]);
 
   useEffect(() => {
-    if (!pathname.includes("/notes/filter")) {
-      return;
-    }
-
-    const newSearchParams = new URLSearchParams();
-
-    if (page > 1) {
-      newSearchParams.set("page", String(page));
-    }
-    if (debouncedQuery) {
-      newSearchParams.set("search", debouncedQuery);
-    }
-
-    const newUrl = `/notes/filter/${initialTag}?${newSearchParams.toString()}`;
-
-    if (newUrl !== pathname + "?" + searchParams.toString()) {
-      router.replace(newUrl);
-    }
-  }, [page, debouncedQuery, initialTag, router, pathname, searchParams]);
+    queryClient.invalidateQueries({
+      queryKey: ["notes", debouncedQuery, page, tag],
+    });
+  }, [tag, debouncedQuery, page, queryClient]);
 
   const { data, isLoading, isFetching } = useQuery<FetchNotesResponse, Error>({
-    queryKey: ["notes", debouncedQuery, page, initialTag],
+    queryKey: ["notes", debouncedQuery, page, tag],
     queryFn: () =>
-      fetchNotes(
-        page,
-        12,
-        debouncedQuery,
-        initialTag === "All" ? undefined : initialTag
-      ),
+      fetchNotes(page, 12, debouncedQuery, tag === "All" ? undefined : tag),
     enabled: true,
     placeholderData: keepPreviousData,
     retry: 1,
-    initialData: initialNotesData,
+    initialData: notesData,
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const handleSearch = (searchQuery: string) => {
@@ -93,38 +59,22 @@ export default function NotesClient({
     setPage(selectedPage);
   };
 
-  const notesToShow = data?.notes || [];
-  const showLoader = (isLoading && !notesToShow.length) || isFetching;
-
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
+  const notesToShow = data?.notes || [];
+  const showLoader = isLoading || isFetching;
+
   return (
     <div>
-      <Toaster />{" "}
+      <Toaster />
       <main className={css.app}>
-        {" "}
         <div className={css.toolbar}>
-          <SearchBox onSearch={handleSearch} initialQuery={query} /> {}
-          <div className={css.tagFilter}>
-            {allTags.map((tag) => (
-              <Link
-                key={tag}
-                href={
-                  tag === "All" ? "/notes/filter/All" : `/notes/filter/${tag}`
-                }
-                className={
-                  initialTag === tag ? css.activeTagButton : css.tagButton
-                }
-              >
-                {tag}
-              </Link>
-            ))}
-          </div>{" "}
+          <SearchBox onSearch={handleSearch} initialQuery={query} />
           <button className={css.button} onClick={handleOpenModal}>
-            Create note +{" "}
-          </button>{" "}
-        </div>{" "}
+            Create note +
+          </button>
+        </div>
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}
@@ -133,14 +83,14 @@ export default function NotesClient({
           />
         )}
         {showLoader && <Loader />}
-        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
-        {notesToShow.length === 0 && !showLoader && <p>No notes found.</p>}{" "}
-      </main>{" "}
+        <NoteList notes={notesToShow} />
+        {!showLoader && notesToShow.length === 0 && <p>No notes found.</p>}
+      </main>
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-          <NoteForm allTags={allTags} onClose={handleCloseModal} />  {" "}
+          <NoteForm onClose={handleCloseModal} />
         </Modal>
-      )}{" "}
+      )}
     </div>
   );
 }
