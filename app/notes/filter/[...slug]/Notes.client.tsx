@@ -83,7 +83,7 @@ export default function NotesClient({ notesData, tag }: NotesClientProps) {
           />
         )}
         {showLoader && <Loader />}
-        <NoteList notes={notesToShow} />
+        {notesToShow.length > 0 && <NoteList notes={notesToShow} />}
         {!showLoader && notesToShow.length === 0 && <p>No notes found.</p>}
       </main>
       {isModalOpen && (
