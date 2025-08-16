@@ -1,5 +1,8 @@
 /* components/SearchBox/SearchBox.tsx */
-import React, { useState, useEffect } from "react";
+"use client";
+
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 import css from "./SearchBox.module.css";
 
 interface SearchBoxProps {
@@ -13,17 +16,18 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 }) => {
   const [query, setQuery] = useState(initialQuery);
 
-  useEffect(() => {
-    setQuery(initialQuery);
-  }, [initialQuery]);
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!query.trim()) {
+      toast.error("Please enter a search query.");
+      return;
+    }
     onSearch(query);
+    setQuery("");
   };
 
   return (

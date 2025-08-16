@@ -9,10 +9,7 @@ export const metadata: Metadata = {
 };
 
 interface NotesPageProps {
-  searchParams: {
-    page?: string;
-    search?: string;
-  };
+  searchParams: Promise<{ page?: string; search?: string }>;
   params: Promise<{ slug?: string[] }>;
 }
 
